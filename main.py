@@ -66,36 +66,8 @@ for face in faces:
     bottom_right_x = (n_mouth - n_right) / (m_right - m_mouth)
     bottom_right_y = m_mouth * bottom_right_x + n_mouth
 
-    # Calculate the bounding box, Probably not needed
-    max_x = 0
-    max_y = 0
-    min_x = 0
-    min_y = 0
-
-    if bottom_right_x > top_right_x:
-        max_x = bottom_right_x
-    else:
-        max_x = top_right_x
-
-    if bottom_left_x < top_left_x:
-        min_x = bottom_left_x
-    else:
-        min_x = top_left_x
-
-    if top_left_y > top_right_y:
-        max_y = top_left_y
-    else:
-        max_y = top_right_y
-
-    if bottom_left_y < bottom_right_y:
-        min_y = bottom_left_y
-    else:
-        min_y = bottom_right_y
-
     box = np.array([[[top_left_x, top_left_y], [top_right_x, top_right_y], [bottom_right_x, bottom_right_y],
                      [bottom_left_x, bottom_left_y]]], np.int32)
-
-    bounding_box = np.array([[[max_x, min_y], [max_x, max_y], [min_x, max_y], [min_x, min_y]]], np.int32)
 
     # FIXME: Orientation issues
     sm_area_box = cv2.minAreaRect(box)
@@ -120,4 +92,4 @@ cv2.imshow(winname="Face", mat=img)
 cv2.waitKey(delay=0)
 cv2.destroyAllWindows()
 
-cv2.imwrite("faceWithSchnurrbart.jpg", img)
+cv2.imwrite("modified_face.jpg", img)
