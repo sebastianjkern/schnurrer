@@ -1,19 +1,23 @@
 import cv2
 import dlib
 import numpy as np
+import sys
 
 detector = dlib.get_frontal_face_detector()
 predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
 
-img = cv2.imread("face.jpg")
-schnurrbart = cv2.imread("schnurrbart.png")
+img = cv2.imread(sys.argv[1])
 
-cv2.imshow(winname="Face", mat=schnurrbart)
+if img is None:
+    exit()
 
-cv2.waitKey(delay=0)
+dimensions = img.shape
+
+schnurrbart = cv2.imread("schnurrbart.jpg")
+schnurrbart = cv2.resize(schnurrbart, (dimensions[0], dimensions[1]))
+schnurrbart = (255 - schnurrbart)
 
 gray = cv2.cvtColor(src=img, code=cv2.COLOR_BGR2GRAY)
-
 faces = detector(gray)
 
 for face in faces:
@@ -62,21 +66,21 @@ for face in faces:
     bottom_right_x = (n_mouth - n_right) / (m_right - m_mouth)
     bottom_right_y = m_mouth * bottom_right_x + n_mouth
 
-    # Calculate the bounding box
+    # Calculate the bounding box, Probably not needed
     max_x = 0
     max_y = 0
     min_x = 0
     min_y = 0
 
-    if top_left_x > top_right_x:
-        max_x = top_left_x
+    if bottom_right_x > top_right_x:
+        max_x = bottom_right_x
     else:
         max_x = top_right_x
 
-    if bottom_left_x < bottom_right_x:
+    if bottom_left_x < top_left_x:
         min_x = bottom_left_x
     else:
-        min_x = bottom_right_x
+        min_x = top_left_x
 
     if top_left_y > top_right_y:
         max_y = top_left_y
@@ -91,14 +95,29 @@ for face in faces:
     box = np.array([[[top_left_x, top_left_y], [top_right_x, top_right_y], [bottom_right_x, bottom_right_y],
                      [bottom_left_x, bottom_left_y]]], np.int32)
 
-    cv2.polylines(img, box, True, (0, 255, 0), thickness=3)
+    bounding_box = np.array([[[max_x, min_y], [max_x, max_y], [min_x, max_y], [min_x, min_y]]], np.int32)
 
-    for n in range(0, 68):
-        x = landmarks.part(n).x
-        y = landmarks.part(n).y
+    # FIXME: Orientation issues
+    sm_area_box = cv2.minAreaRect(box)
+    points = cv2.boxPoints(sm_area_box)
+    points = np.int0(points)
 
-        cv2.circle(img=img, center=(x, y), radius=3, color=(0, 255, 0), thickness=-1)
+    src = np.float32([[0, 0], [img.shape[1], 0], [img.shape[1], img.shape[0]], [0, img.shape[0]]])
+    int_src = np.int0(src)
+    dst = np.float32(points)
+    perspective_transform_matrix = cv2.getPerspectiveTransform(src, dst)
+
+    transformed_schnurrbart = cv2.warpPerspective(schnurrbart, perspective_transform_matrix,
+                                                  (img.shape[1], img.shape[0]))
+    cv2.threshold(transformed_schnurrbart, 10, 255, type=0, dst=transformed_schnurrbart)
+
+    mask = cv2.cvtColor(src=transformed_schnurrbart, code=cv2.COLOR_BGR2GRAY)
+    transformed_schnurrbart = (255 - transformed_schnurrbart)
+
+    cv2.copyTo(transformed_schnurrbart, mask, img)
 
 cv2.imshow(winname="Face", mat=img)
 cv2.waitKey(delay=0)
 cv2.destroyAllWindows()
+
+cv2.imwrite("faceWithSchnurrbart.jpg", img)
