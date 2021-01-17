@@ -5,6 +5,10 @@ Please don't ask why.
 
 ## Requirements
 
+To get a copy up and running, please install 
+all the dependencies listed down below.
+
+- numpy
 - dlib
 - opencv-python
 
