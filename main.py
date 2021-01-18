@@ -1,21 +1,27 @@
+import sys
+
 import cv2
 import dlib
 import numpy as np
-import sys
 
 detector = dlib.get_frontal_face_detector()
 predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
 
+if len(sys.argv) < 2:
+    print("Usage: python main.py <path>")
+    exit()
+
 img = cv2.imread(sys.argv[1])
 
 if img is None:
+    print("Something went wrong trying to read the image...")
     exit()
 
 dimensions = img.shape
 
-schnurrbart = cv2.imread("schnurrbart.jpg")
-schnurrbart = cv2.resize(schnurrbart, (dimensions[1], dimensions[0]))
-schnurrbart = (255 - schnurrbart)
+moustache = cv2.imread("schnurrbart.jpg")
+moustache = cv2.resize(moustache, (dimensions[1], dimensions[0]))
+moustache = (255 - moustache)
 
 gray = cv2.cvtColor(src=img, code=cv2.COLOR_BGR2GRAY)
 faces = detector(gray)
@@ -47,7 +53,6 @@ for face in faces:
     m_nose = (nose_left_y - nose_right_y) / (nose_left_x - nose_right_x)
     n_nose = nose_point_y - m_nose * nose_point_x
 
-    # Calculate the four points
     m_left = (mouth_left_y - nose_left_y) / (mouth_left_x - nose_left_x)
     n_left = mouth_left_y - m_left * mouth_left_x
 
@@ -79,14 +84,14 @@ for face in faces:
     dst = np.float32(box)
     perspective_transform_matrix = cv2.getPerspectiveTransform(src, dst)
 
-    transformed_schnurrbart = cv2.warpPerspective(schnurrbart, perspective_transform_matrix,
-                                                  (img.shape[1], img.shape[0]))
-    cv2.threshold(transformed_schnurrbart, 10, 255, type=0, dst=transformed_schnurrbart)
+    transformed_moustache = cv2.warpPerspective(moustache, perspective_transform_matrix,
+                                                (img.shape[1], img.shape[0]))
+    cv2.threshold(transformed_moustache, 10, 255, type=0, dst=transformed_moustache)
 
-    mask = cv2.cvtColor(src=transformed_schnurrbart, code=cv2.COLOR_BGR2GRAY)
-    transformed_schnurrbart = (255 - transformed_schnurrbart)
+    mask = cv2.cvtColor(src=transformed_moustache, code=cv2.COLOR_BGR2GRAY)
+    transformed_moustache = (255 - transformed_moustache)
 
-    cv2.copyTo(transformed_schnurrbart, mask, img)
+    cv2.copyTo(transformed_moustache, mask, img)
 
 cv2.imshow(winname="Face", mat=img)
 cv2.waitKey(delay=0)
