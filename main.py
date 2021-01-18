@@ -14,7 +14,7 @@ if img is None:
 dimensions = img.shape
 
 schnurrbart = cv2.imread("schnurrbart.jpg")
-schnurrbart = cv2.resize(schnurrbart, (dimensions[0], dimensions[1]))
+schnurrbart = cv2.resize(schnurrbart, (dimensions[1], dimensions[0]))
 schnurrbart = (255 - schnurrbart)
 
 gray = cv2.cvtColor(src=img, code=cv2.COLOR_BGR2GRAY)
@@ -74,8 +74,9 @@ for face in faces:
     points = cv2.boxPoints(sm_area_box)
     points = np.int0(points)
 
+    print(sm_area_box)
+
     src = np.float32([[0, 0], [img.shape[1], 0], [img.shape[1], img.shape[0]], [0, img.shape[0]]])
-    int_src = np.int0(src)
     dst = np.float32(points)
     perspective_transform_matrix = cv2.getPerspectiveTransform(src, dst)
 
