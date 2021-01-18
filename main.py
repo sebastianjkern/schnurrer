@@ -66,18 +66,16 @@ for face in faces:
     bottom_right_x = (n_mouth - n_right) / (m_right - m_mouth)
     bottom_right_y = m_mouth * bottom_right_x + n_mouth
 
-    box = np.array([[[top_left_x, top_left_y], [top_right_x, top_right_y], [bottom_right_x, bottom_right_y],
-                     [bottom_left_x, bottom_left_y]]], np.int32)
+    box = np.array([[[bottom_right_x, bottom_right_y], [bottom_left_x, bottom_left_y], [top_left_x, top_left_y],
+                     [top_right_x, top_right_y]]], np.int32)
 
     # FIXME: Orientation issues
     sm_area_box = cv2.minAreaRect(box)
     points = cv2.boxPoints(sm_area_box)
     points = np.int0(points)
 
-    print(sm_area_box)
-
     src = np.float32([[0, 0], [img.shape[1], 0], [img.shape[1], img.shape[0]], [0, img.shape[0]]])
-    dst = np.float32(points)
+    dst = np.float32(box)
     perspective_transform_matrix = cv2.getPerspectiveTransform(src, dst)
 
     transformed_schnurrbart = cv2.warpPerspective(schnurrbart, perspective_transform_matrix,
