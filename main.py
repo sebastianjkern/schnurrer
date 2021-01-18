@@ -70,9 +70,10 @@ for face in faces:
                      [top_right_x, top_right_y]]], np.int32)
 
     # FIXME: Orientation issues
-    sm_area_box = cv2.minAreaRect(box)
-    points = cv2.boxPoints(sm_area_box)
-    points = np.int0(points)
+    # FIXME: Probably bad order of the points
+    # sm_area_box = cv2.minAreaRect(box)
+    # points = cv2.boxPoints(sm_area_box)
+    # points = np.int0(points)
 
     src = np.float32([[0, 0], [img.shape[1], 0], [img.shape[1], img.shape[0]], [0, img.shape[0]]])
     dst = np.float32(box)
