@@ -1,6 +1,6 @@
 # Schnurrer
 
-Detects faces in images and copies a Schnurrbart into them. 
+Detects faces in images and copies a moustache into them. 
 Please don't ask why. 
 
 ## Example
