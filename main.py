@@ -19,7 +19,7 @@ if img is None:
 
 dimensions = img.shape
 
-moustache = cv2.imread("schnurrbart.jpg")
+moustache = cv2.imread("moustache.jpg")
 moustache = cv2.resize(moustache, (dimensions[1], dimensions[0]))
 moustache = (255 - moustache)
 
@@ -47,6 +47,8 @@ for face in faces:
     nose_right_x = landmarks.part(35).x
     nose_right_y = landmarks.part(35).y
 
+    print(landmarks.part(32))
+
     m_mouth = (mouth_left_y - mouth_right_y) / (mouth_left_x - mouth_right_x)
     n_mouth = mouth_point_y - m_mouth * mouth_point_x
 
@@ -73,12 +75,6 @@ for face in faces:
 
     box = np.array([[[bottom_right_x, bottom_right_y], [bottom_left_x, bottom_left_y], [top_left_x, top_left_y],
                      [top_right_x, top_right_y]]], np.int32)
-
-    # FIXME: Orientation issues
-    # FIXME: Probably bad order of the points
-    # sm_area_box = cv2.minAreaRect(box)
-    # points = cv2.boxPoints(sm_area_box)
-    # points = np.int0(points)
 
     src = np.float32([[0, 0], [img.shape[1], 0], [img.shape[1], img.shape[0]], [0, img.shape[0]]])
     dst = np.float32(box)
