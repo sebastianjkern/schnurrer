@@ -5,8 +5,6 @@ Please don't ask why.
 
 ## Example
 
-Running:
-
 ```
 python main.py face1.jpg
 ```
